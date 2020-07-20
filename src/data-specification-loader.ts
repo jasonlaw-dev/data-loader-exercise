@@ -56,6 +56,7 @@ export class DataSpecificationLoader {
     if (!columns.length) {
       throw new Error('No columns found');
     }
+    const processedColumnNames: { [key: string]: boolean; } = {};
     columns.forEach((column) => {
       if (!column.columnName || !column.columnName.match(/^[_a-zA-Z][_a-zA-Z0-9]*$/)) {
         throw new ColumnError(column.columnName, 'invalid column name');
@@ -69,6 +70,10 @@ export class DataSpecificationLoader {
       if (column.dataType === 'BOOLEAN' && column.width !== 1) {
         throw new ColumnError(column.columnName, 'boolean width must be 1');
       }
+      if (processedColumnNames[column.columnName]) {
+        throw new ColumnError(column.columnName, 'duplicate column name');
+      }
+      processedColumnNames[column.columnName] = true;
     });
     return {
       key: filename.replace(/\.csv$/, ''),
