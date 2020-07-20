@@ -15,6 +15,10 @@ export class DataSpecificationLoader {
   constructor(private baseDir: string) {
   }
 
+  /**
+   * Load all specifications in csv in the baseDir specified
+   * @return an object containing specs and errors loaded
+   */
   async loadSpecifications() {
     const filenames = (await fs.promises.readdir(this.baseDir))
       .filter((filename) => filename.endsWith('.csv'));
@@ -26,6 +30,10 @@ export class DataSpecificationLoader {
     return { specs, errors };
   }
 
+  /**
+   * Load specification from the specified csv file
+   * @param filename filename of the specification
+   */
   async loadSpecification(filename: string): Promise<DataSpecification> {
     const fileBuffer = await fs.promises.readFile(path.join(this.baseDir, filename));
     const columns: DataColumn[] = await new Promise((resolve, reject) => {
