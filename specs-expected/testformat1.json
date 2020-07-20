@@ -1,0 +1,20 @@
+{
+  "key": "testformat1",
+  "columns": [
+    {
+      "columnName": "name",
+      "width": 10,
+      "dataType": "TEXT"
+    },
+    {
+      "columnName": "valid",
+      "width": 1,
+      "dataType": "BOOLEAN"
+    },
+    {
+      "columnName": "count",
+      "width": 3,
+      "dataType": "INTEGER"
+    }
+  ]
+}
