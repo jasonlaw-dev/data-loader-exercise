@@ -90,6 +90,28 @@ describe('Data Loader', () => {
         expect(dbResult).to.include(sampleOutput[index]);
       });
     });
+
+    it('should load the sample test file with errors', async () => {
+      const {
+        reportDate, linesSaved, errors, linesProcessed,
+      } = await loader.loadFile('testformat1_2015-06-29.txt');
+      expect(linesSaved).to.equal(1);
+      expect(linesProcessed).to.equal(4); // empty last lione
+      expect(errors).to.have.lengthOf(2);
+      const dbResults = await knex(sampleSpec.key).withSchema(schema).where('_reportDate', reportDate);
+      expect(dbResults).to.have.lengthOf(linesSaved);
+      expect(errors[0].message).to.include('Line 1 - valid - is not 0 or 1');
+      expect(errors[1].message).to.include('Line 2 - num1 - is not a number');
+    });
+
+    it('should load multiple sample test files', async () => {
+      const results = await loader.loadFiles();
+      const filenames = Object.keys(results);
+      expect(filenames).to.include('testformat1_2015-06-28.txt');
+      expect(filenames[1]).to.include('testformat1_2015-06-29.txt');
+      const dbResults = await knex(sampleSpec.key).withSchema(schema).select();
+      expect(dbResults).to.have.lengthOf(dbResults.length);
+    });
   });
   describe('Loading generated data files', function () {
     this.timeout(1000 * 60);
