@@ -2,3 +2,4 @@
 name,10,TEXT
 valid,1,BOOLEAN
 count,3,INTEGER
+num1,10,INTEGER

@@ -9,6 +9,7 @@ import { LineError } from './interfaces/line-error';
 
 interface DataLoaderOptionsOptional {
   chunkSize?: number;
+  skipErrorLines?: boolean;
 }
 
 interface DataLoaderOptionsRequired {
@@ -28,7 +29,11 @@ export class DataLoader {
   constructor(
     options: DataLoaderOptions,
   ) {
-    this.options = { chunkSize: 10000, ...options };
+    this.options = {
+      chunkSize: 10000,
+      skipErrorLines: false,
+      ...options,
+    };
   }
 
   /**
@@ -105,24 +110,26 @@ export class DataLoader {
     };
 
     try {
-      let chunk: string[] | null = [];
-      while (chunk) {
-        chunk = await stream.readChunk(chunkSize);
-        if (chunk) {
-          await process(chunk);
-        }
+      let chunk: null | string[] = null;
+      // eslint-disable-next-line no-cond-assign
+      while (chunk = await stream.readChunk(chunkSize)) {
+        await process(chunk);
       }
-      if (errors.length > 0) {
+      if (errors.length > 0 && !this.options.skipErrorLines) {
+        linesSaved = 0;
         await txn.rollback();
       } else {
         await txn.commit();
       }
     } catch (e) {
+      linesSaved = 0;
       await txn.rollback();
       throw e;
     }
 
-    return { linesProcessed, linesSaved, errors };
+    return {
+      reportDate, linesProcessed, linesSaved, errors,
+    };
   }
 
   private async processLines(lines: string[], lineNumberStart: number, reportDate: Date) {
