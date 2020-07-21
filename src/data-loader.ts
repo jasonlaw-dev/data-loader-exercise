@@ -46,7 +46,7 @@ export class DataLoader {
     const filenames = (await fs.promises.readdir(this.options.baseDir))
       .filter((filename) => (
         // Check the filename length to ensure we are not loading files from another spec
-        filename.length === key.length + 14
+        filename.length === key.length + 15
         && filename.startsWith(key)
         && this.suffixRegex.test(filename)
       ));
