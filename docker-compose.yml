@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  app:
+    image: data-loader-exercise
+    build: .
+    volumes:
+      - ./knex-config-docker.json:/app/knex-config.json
+      - ./data:/app/data
+      - ./specs:/app/specs
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: example
+volumes:
+  db-data:

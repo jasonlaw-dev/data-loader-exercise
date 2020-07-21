@@ -1,0 +1,9 @@
+{
+  "client": "pg",
+  "connection": {
+    "host": "db",
+    "user": "postgres",
+    "password": "example",
+    "database": "postgres"
+  }
+}

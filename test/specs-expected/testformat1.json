@@ -15,6 +15,11 @@
       "columnName": "count",
       "width": 3,
       "dataType": "INTEGER"
+    },
+    {
+      "columnName": "num1",
+      "width": 10,
+      "dataType": "INTEGER"
     }
   ]
 }

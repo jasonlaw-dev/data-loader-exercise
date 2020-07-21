@@ -25,7 +25,10 @@ export class DataSpecificationLoader {
     const specs: DataSpecification[] = [];
     const errors: Error[] = [];
     await Promise.all(filenames.map((filename) => (
-      this.loadSpecification(filename).then(specs.push, errors.push)
+      this.loadSpecification(filename).then(
+        (spec) => specs.push(spec),
+        (error) => errors.push(error),
+      )
     )));
     return { specs, errors };
   }

@@ -5,10 +5,11 @@ import path from 'path';
 import { DataSpecificationLoader } from './data-specification-loader';
 
 describe('Data Specification Loader', () => {
-  const baseDir = 'specs';
-  const loader = new DataSpecificationLoader(baseDir);
+  const specsBaseDir = path.join('test', 'specs');
+  const expectedBaseDir = path.join('test', 'specs-expected');
+  const loader = new DataSpecificationLoader(specsBaseDir);
   const verifySpecification = async (filename: string) => {
-    const expectedJsonFilePath = path.join('specs-expected', filename.replace(/\.csv/, '.json'));
+    const expectedJsonFilePath = path.join(expectedBaseDir, filename.replace(/\.csv/, '.json'));
     if (!fs.existsSync(expectedJsonFilePath)) {
       throw new Error('Expected Json file does not exist');
     }
@@ -27,7 +28,7 @@ describe('Data Specification Loader', () => {
     it('should load the sample test file', async () => {
       await verifySpecification('testformat1.csv');
     });
-    fs.readdirSync(baseDir)
+    fs.readdirSync(specsBaseDir)
       .filter((filename) => filename.includes('error'))
       .forEach((filename) => {
         it(`should throw error for ${filename}`, async () => {
