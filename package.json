@@ -4,6 +4,7 @@
   "description": "Data loader exercise",
   "main": "index.js",
   "scripts": {
+    "start": "ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jason Law <jasonlaw.dev@gmail.com>",
@@ -26,6 +27,8 @@
   },
   "dependencies": {
     "csv-parse": "^4.11.1",
-    "event-stream": "^4.0.1"
+    "event-stream": "^4.0.1",
+    "knex": "^0.21.2",
+    "pg": "^8.3.0"
   }
 }
