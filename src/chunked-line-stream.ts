@@ -45,7 +45,12 @@ export class ChunkedLineStream {
     });
   }
 
-  async readChunk(size: number) {
+  /**
+   * Read lines in a specified chunk size
+   * @param size number of lines in a chunk
+   * @return Array of lines in string, or null if we have already finished reading the file
+   */
+  async readChunk(size: number): Promise<string[] | null> {
     if (this.error) {
       throw this.error;
     }
