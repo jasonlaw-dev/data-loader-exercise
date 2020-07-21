@@ -4,6 +4,8 @@ import Knex from 'knex';
 import path from 'path';
 import { ChunkedLineStream } from './chunked-line-stream';
 import { DbHelper } from './db-helper';
+import { DataLoaderResult } from './interfaces/data-loader-result';
+import { DataLoaderResults } from './interfaces/data-loader-results';
 import { DataSpecification } from './interfaces/data-specification';
 import { LineError } from './interfaces/line-error';
 
@@ -31,7 +33,7 @@ export class DataLoader {
   ) {
     this.options = {
       chunkSize: 10000,
-      skipErrorLines: false,
+      skipErrorLines: true,
       ...options,
     };
   }
@@ -39,7 +41,7 @@ export class DataLoader {
   /**
    * Load files that matches the key on the specification in the baseDir
    */
-  async loadFiles() {
+  async loadFiles(): Promise<DataLoaderResults> {
     const { key } = this.options.spec;
     const filenames = (await fs.promises.readdir(this.options.baseDir))
       .filter((filename) => (
@@ -48,10 +50,12 @@ export class DataLoader {
         && filename.startsWith(key)
         && this.suffixRegex.test(filename)
       ));
+    const results: DataLoaderResults = {};
     // eslint-disable-next-line no-restricted-syntax
     for (const filename of filenames) {
-      await this.loadFile(filename);
+      results[filename] = await this.loadFile(filename);
     }
+    return results;
   }
 
   /**
@@ -62,7 +66,7 @@ export class DataLoader {
    * This assumes the database has a mechanism of saving uncommitted transactions to disk.
    * @param filename filename to be loaded
    */
-  async loadFile(filename: string) {
+  async loadFile(filename: string): Promise<DataLoaderResult> {
     const match = filename.match(this.suffixRegex);
     if (match == null) {
       throw new Error('Filename does not match the required format');
@@ -102,7 +106,7 @@ export class DataLoader {
         linesSaved += processed.results.length;
         linesProcessed += lines.length;
         errors.push(...processed.errors);
-        console.log(`Saved: ${processed.results.length}, totalSaved: ${linesSaved}, Errors: ${processed.errors.length}`);
+        console.log(`[${filename}]: Saved: ${processed.results.length}, totalSaved: ${linesSaved}, Errors: ${processed.errors.length}`);
       } catch (e) {
         console.error(e);
         errors.push(e);
@@ -124,7 +128,7 @@ export class DataLoader {
     } catch (e) {
       linesSaved = 0;
       await txn.rollback();
-      throw e;
+      errors.push(e);
     }
 
     return {
@@ -168,7 +172,7 @@ export class DataLoader {
         valueString = valueString.trim();
         if (valueString) { // use null if string is empty
           value = parseInt(valueString, 10);
-          if (Number.isNaN(value)) {
+          if (Number.isNaN(value) || !(/^-?[0-9]+$/.test(valueString))) {
             throw new LineError(lineNumber, col.columnName, 'is not a number');
           }
         }
