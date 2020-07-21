@@ -1,5 +1,5 @@
 # Data Loader
-A small programs that reads data specification and loads corresponding input files into postgres database (it should work with all databases supported by knex if you install the corresponding driver).
+A small program that reads data specification and loads corresponding input files into postgres database (it should work with all databases supported by knex if you install the corresponding driver).
 
 ## Specification requirement
 Data specification files should be a csv with three columns, "column name", "width" and "datatype".
